@@ -9,7 +9,7 @@ import (
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
-	"github.com/yodzafar/fm/user-service/internal/domain"
+	"github.com/yodzafar/food-marketpalce/user-service/internal/domain"
 )
 
 type userPostgresRepo struct {

@@ -647,7 +647,7 @@ const file_proto_user_user_proto_rawDesc = "" +
 	"\x05Login\x12\x12.user.LoginRequest\x1a\x13.user.LoginResponse\x126\n" +
 	"\aGetUser\x12\x14.user.GetUserRequest\x1a\x15.user.GetUserResponse\x12?\n" +
 	"\n" +
-	"UpdateUser\x12\x17.user.UpdateUserRequest\x1a\x18.user.UpdateUserResponseB.Z,github.com/yodzafar/fm/user-service/gen/userb\x06proto3"
+	"UpdateUser\x12\x17.user.UpdateUserRequest\x1a\x18.user.UpdateUserResponseB.Z,github.com/yodzafar/food-marketpalce/user-service/gen/userb\x06proto3"
 
 var (
 	file_proto_user_user_proto_rawDescOnce sync.Once

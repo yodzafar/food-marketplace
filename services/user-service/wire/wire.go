@@ -2,9 +2,9 @@ package wire
 
 import (
 	"github.com/google/wire"
-	"github.com/yodzafar/fm/user-service/config"
-	"github.com/yodzafar/fm/user-service/internal/pkg/postgres"
-	"github.com/yodzafar/fm/user-service/internal/pkg/redis"
+	"github.com/yodzafar/food-marketpalce/user-service/config"
+	"github.com/yodzafar/food-marketpalce/user-service/internal/pkg/postgres"
+	"github.com/yodzafar/food-marketpalce/user-service/internal/pkg/redis"
 )
 
 func initApp() (error, error) {

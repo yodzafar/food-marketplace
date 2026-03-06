@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-redis/redis"
 	"github.com/google/wire"
-	"github.com/yodzafar/fm/user-service/config"
+	"github.com/yodzafar/food-marketpalce/user-service/config"
 )
 
 func newConnection(cfg *config.Config) (*redis.Client, error) {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/wire"
 	"github.com/jmoiron/sqlx"
-	"github.com/yodzafar/fm/user-service/config"
+	"github.com/yodzafar/food-marketpalce/user-service/config"
 )
 
 func newConnection(cfg *config.Config) (*sqlx.DB, error) {

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package user;
 
-option go_package = "github.com/yodzafar/fm/user-service/gen/user";
+option go_package = "github.com/yodzafar/food-marketpalce/user-service/gen/user";
 
 import "google/protobuf/timestamp.proto";
 

@@ -1,4 +1,4 @@
-module github.com/yodzafar/fm/user-service
+module github.com/yodzafar/food-marketpalce/user-service
 
 go 1.25.0
 
