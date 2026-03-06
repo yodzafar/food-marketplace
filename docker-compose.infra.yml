@@ -1,0 +1,253 @@
+services:
+
+  #---- Postgres ----------#
+
+  # User Postgres
+  user-pg:
+    image: postgres:16-alpine
+    container_name: fm_user_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: eswun3ua
+      POSTGRES_DB: fm_user_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - fm_user_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Restaurant Postgres
+  restaurant-pg:
+    image: postgres:16-alpine
+    container_name: fm_restaurant_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: eswun3ua
+      POSTGRES_DB: fm_restaurant_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - fm_restaurant_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Menu Postgres
+  menu-pg:
+    image: postgres:16-alpine
+    container_name: fm_menu_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: eswun3ua
+      POSTGRES_DB: fm_menu_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - fm_menu_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Order Postgres
+  order-pg:
+    image: postgres:16-alpine
+    container_name: fm_order_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: eswun3ua
+      POSTGRES_DB: fm_order_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - fm_order_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Review Postgres
+  review-pg:
+    image: postgres:16-alpine
+    container_name: fm_review_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: eswun3ua
+      POSTGRES_DB: fm_review_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - fm_review_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Analytics Postgres
+  analytics-pg:
+    image: postgres:16-alpine
+    container_name: fm_analytics_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: eswun3ua
+      POSTGRES_DB: fm_analytics_db
+    ports:
+      - "5437:5432"
+    volumes:
+      - fm_analytics_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  #---- Redis ----------#
+  redis:
+    image: redis:7-alpine
+    container_name: fm_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - fm_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: fm_redisinsight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+    environment:
+      REDIS_HOST: fm_redis
+      REDIS_PORT: 6379
+
+  #---- Kafka ----------#
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: fm_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - fm_zookeeper_data:/var/lib/zookeeper
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: fm_kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - fm_kafka_data:/var/lib/kafka
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: fm_kafka_ui
+    depends_on:
+      - kafka
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+
+  #---- Elasticsearch + Kibana ----------#
+
+  elasticsearch:
+    image: elasticsearch:8.13.0
+    container_name: fm_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - fm_elastic_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  kibana:
+    image: kibana:8.13.0
+    container_name: fm_kibana
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+
+  #---- Minio ----------#
+  minio:
+    image: minio/minio
+    container_name: fm_minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    volumes:
+      - fm_minio_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  #---- PGAdmin ----------#
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: fm_pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - user-pg
+      - restaurant-pg
+      - menu-pg
+      - order-pg
+      - review-pg
+      - analytics-pg
+
+volumes:
+  fm_user_pg_data:
+  fm_restaurant_pg_data:
+  fm_menu_pg_data:
+  fm_order_pg_data:
+  fm_review_pg_data:
+  fm_analytics_pg_data:
+  fm_redis_data:
+  fm_zookeeper_data:
+  fm_kafka_data:
+  fm_elastic_data:
+  fm_minio_data:

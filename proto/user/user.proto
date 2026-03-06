@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/yodzafar/fm/user-service/gen/user";
+
+import "google/protobuf/timestamp.proto";
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  ROLE_UNSPECIFIED = 0;
+  ROLE_CUSTOMER    = 1;
+  ROLE_RESTAURANT  = 2;
+  ROLE_ADMIN       = 3;
+}
+
+// ─── Entities ────────────────────────────────────────────────────────────────
+
+message User {
+  string                    id         = 1;
+  string                    name       = 2;
+  string                    email      = 3;
+  string                    phone      = 4;
+  string                    role       = 5;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+// ─── Requests ────────────────────────────────────────────────────────────────
+message RegisterRequest {
+  string name     = 1;
+  string email    = 2;
+  string password = 3;
+  string phone    = 4;
+  Role   role     = 5;
+}
+
+message LoginRequest {
+  string email    = 1;
+  string password = 2;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message UpdateUserRequest {
+  string id    = 1;
+  string name  = 2;
+  string phone = 3;
+}
+
+// ─── Responses ───────────────────────────────────────────────────────────────
+
+message RegisterResponse {
+  string token = 1;
+  User   user  = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+  User   user  = 2;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+message UpdateUserResponse {
+  User user = 1;
+}
+
+// ─── Service ─────────────────────────────────────────────────────────────────
+
+service UserService {
+  rpc Register   (RegisterRequest)   returns (RegisterResponse);
+  rpc Login      (LoginRequest)      returns (LoginResponse);
+  rpc GetUser    (GetUserRequest)    returns (GetUserResponse);
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse);
+}
