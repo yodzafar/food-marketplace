@@ -1,1 +1,39 @@
+# IDE
 .idea/
+
+# Go binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# Go test/build
+*.test
+*.out
+cover.out
+coverage.html
+
+# Go vendor (if not committed)
+# vendor/
+
+# Environment files
+.env
+*.env.local
+
+# Generated code (uncomment if you regenerate from proto)
+# gen/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
+
+# Temp files
+tmp/
+*.tmp
+*.swp
+*~
