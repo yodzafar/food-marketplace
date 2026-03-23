@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
@@ -54,13 +55,13 @@ func (ur userPostgresRepo) GetByID(ctx context.Context, id string) (*domain.User
 		ToSql()
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to get user by id: %w", err)
+		return nil, fmt.Errorf("build query: %w", err)
 	}
 
 	user := &domain.User{}
 	err = ur.db.QueryRowxContext(ctx, query, args...).StructScan(user)
 
-	if !errors.Is(err, sql.ErrNoRows) {
+	if errors.Is(err, sql.ErrNoRows) {
 		return nil, domain.ErrNotFound
 	}
 
@@ -72,11 +73,50 @@ func (ur userPostgresRepo) GetByID(ctx context.Context, id string) (*domain.User
 }
 
 func (ur userPostgresRepo) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
-	//TODO implement me
-	panic("implement me")
+	query, args, err := ur.sq.Select("id", "name", "email", "phone", "role", "created_at", "updated_at").
+		From("users").
+		Where(sq.Eq{"email": email}).
+		ToSql()
+
+	if err != nil {
+		return nil, fmt.Errorf("build query: %w", err)
+	}
+
+	user := &domain.User{}
+	err = ur.db.QueryRowxContext(ctx, query, args...).StructScan(user)
+
+	if !errors.Is(err, sql.ErrNoRows) {
+		return nil, domain.ErrNotFound
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user by email: %w", err)
+	}
+
+	return user, nil
 }
 
 func (ur userPostgresRepo) Update(ctx context.Context, user *domain.User) error {
-	//TODO implement me
-	panic("implement me")
+	user.UpdatedAt = time.Now()
+
+	query, args, err := ur.sq.
+		Update("users").
+		Set("name", user.Name).
+		Set("email", user.Email).
+		Set("phone", user.Phone).
+		Set("role", user.Role).
+		Set("updated_at", user.UpdatedAt).
+		Where(sq.Eq{"id": user.ID}).
+		ToSql()
+
+	if err != nil {
+		return fmt.Errorf("build query: %w", err)
+	}
+
+	_, err = ur.db.ExecContext(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("failed to update user: %w", err)
+	}
+
+	return nil
 }

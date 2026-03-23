@@ -10,4 +10,5 @@ var (
 	ErrInvalidRole     = errors.New("invalid role")
 	ErrInvalidInput    = errors.New("invalid input")
 	ErrUnauthorized    = errors.New("unauthorized")
+	ErrCredentials     = errors.New("invalid credentials")
 )

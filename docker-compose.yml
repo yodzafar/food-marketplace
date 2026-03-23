@@ -1,0 +1,10 @@
+services:
+  user-service:
+    build:
+      context: .
+      dockerfile: services/user-service/Dockerfile
+    container_name: fm_user_service
+    ports:
+      - "50051:50051"
+    env_file:
+      - services/user-service/.env

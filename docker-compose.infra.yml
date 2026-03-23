@@ -1,5 +1,4 @@
 services:
-
   #---- Postgres ----------#
 
   # User Postgres
@@ -131,9 +130,6 @@ services:
       - "5540:5540"
     depends_on:
       - redis
-    environment:
-      REDIS_HOST: fm_redis
-      REDIS_PORT: 6379
 
   #---- Kafka ----------#
   zookeeper:
@@ -162,6 +158,11 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     volumes:
       - fm_kafka_data:/var/lib/kafka
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "kafka:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -231,6 +232,8 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
       PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - fm_pgadmin_data:/var/lib/pgadmin
     depends_on:
       - user-pg
       - restaurant-pg
@@ -238,6 +241,17 @@ services:
       - order-pg
       - review-pg
       - analytics-pg
+
+  #---- Swagger-UI ----------#
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: fm_swagger_ui
+    ports:
+      - "8091:8080"
+    environment:
+      SWAGGER_JSON: /docs/user.swagger.json
+    volumes:
+      - ./api-gateway/docs/swagger:/docs
 
 volumes:
   fm_user_pg_data:
@@ -251,3 +265,4 @@ volumes:
   fm_kafka_data:
   fm_elastic_data:
   fm_minio_data:
+  fm_pgadmin_data:

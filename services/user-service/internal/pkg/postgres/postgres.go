@@ -5,12 +5,13 @@ import (
 
 	"github.com/google/wire"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"github.com/yodzafar/food-marketpalce/user-service/config"
 )
 
-func newConnection(cfg *config.Config) (*sqlx.DB, error) {
+func New(cfg *config.Config) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		cfg.Postgres.Host, cfg.Postgres.Port, cfg.Postgres.User, cfg.Postgres.Password, cfg.Postgres.DBName,
 	)
 
@@ -24,4 +25,4 @@ func newConnection(cfg *config.Config) (*sqlx.DB, error) {
 	return db, nil
 }
 
-var ProviderSet = wire.NewSet(newConnection)
+var ProviderSet = wire.NewSet(New)

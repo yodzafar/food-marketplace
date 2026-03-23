@@ -11,12 +11,13 @@ const (
 )
 
 type User struct {
-	ID           string     `db:"id" json:"id"`
-	Name         string     `db:"name" json:"name"`
-	Email        string     `db:"email" json:"email"`
-	Phone        string     `db:"phone" json:"phone"`
-	PasswordHash string     `db:"password_hash" json:"-"`
-	Role         Role       `db:"role" json:"role"`
-	CreatedAt    *time.Time `db:"created_at" json:"createdAt"`
-	UpdatedAt    *time.Time `db:"updated_at" json:"updatedAt"`
+	ID           string    `db:"id" json:"id"`
+	Name         string    `db:"name" json:"name"`
+	Email        string    `db:"email" json:"email"`
+	Phone        string    `db:"phone" json:"phone"`
+	PasswordHash string    `db:"password_hash" json:"-"`
+	Role         Role      `db:"role" json:"role"`
+	AvatarUrl    string    `db:"avatar_url" json:"avatarUrl"`
+	CreatedAt    time.Time `db:"created_at" json:"createdAt"`
+	UpdatedAt    time.Time `db:"updated_at" json:"updatedAt"`
 }
